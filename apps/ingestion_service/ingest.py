@@ -1,36 +1,39 @@
+import hashlib
 import os.path
 from datetime import datetime
-import hashlib
 
-from chunking import extract_pages, split_pages, Chunk
-from embedding import EmbeddingService
+from apps.ingestion_service.chunking import extract_pages, split_pages
+from apps.ingestion_service.embedding import EmbeddingService
 
 
 def hash_text(text: str) -> str:
     return hashlib.sha256(text.encode('utf-8')).hexdigest()
 
 
-def enrich_metadata(chunks: list[Chunk], source) -> list[Chunk]:
+def enrich_metadata(chunks: list[dict], source) -> list[dict]:
     for chunk in chunks:
-        chunk.metadata.source = source
-        chunk.hash = hash_text(chunk.text)
-        chunk.ingested_at = datetime.now().isoformat()
+        chunk["metadata"].update(
+            {
+                "source": source,
+                "hash": hash_text(chunk["text"]),
+                "ingested_at": datetime.now().isoformat()
+            }
+        )
     return chunks
 
 
-def deduplicate(chunks: list[Chunk]) -> list[Chunk]:
+def deduplicate(chunks: list[dict]) -> list[dict]:
     seen = set()
     unique = []
     for chunk in chunks:
-        h = chunk.metadata.hash
+        h = chunk["metadata"]["hash"]
         if h not in seen:
             seen.add(h)
             unique.append(chunk)
     return unique
 
 
-def ingest_pdf(file_path: str) -> list[Chunk]:
-    print(f"Ingesting PDF... {file_path}")
+def ingest_pdf(file_path: str) -> list[dict]:
     # Extract
     pages = extract_pages(file_path)
 
@@ -49,4 +52,5 @@ def ingest_pdf(file_path: str) -> list[Chunk]:
     return chunks
 
 
-print(ingest_pdf(os.path.join(os.getcwd(), "data", "raw", "_10-K-2025-As-Filed.pdf")))
+if __name__ == '__main__':
+    print(ingest_pdf(os.path.join(os.getcwd(), "data", "raw", "_10-K-2025-As-Filed.pdf")))
