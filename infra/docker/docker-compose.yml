@@ -5,3 +5,16 @@ services:
       - "6333:6333"
     volumes:
       - ./qdrant_data:/qdrant/storage
+  vllm:
+    image: vllm/vllm-openai:latest
+    runtime: nvidia
+    ports:
+      - "8000:8000"
+    ipc: host
+    environment:
+      HF_TOKEN: ${HF_TOKEN}
+    volumes:
+      - ~/.cache/huggingface:/root/.cache/huggingface
+    command: >
+      --model Qwen/Qwen3-0.6B
+      --api-key local-dev-key

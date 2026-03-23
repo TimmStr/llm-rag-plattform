@@ -16,7 +16,8 @@ class EmbeddingService:
     embedding_config: EmbeddingConfig = load_embedding_config()
 
     def __init__(self, model_name: str = embedding_config.model_name):
-        self.model = SentenceTransformer(model_name)
+        self.model = SentenceTransformer(model_name,
+                                         device=self.embedding_config.device)
 
     def embed(self, texts: list[str]) -> list[dict]:
         embeddings = self.model.encode(

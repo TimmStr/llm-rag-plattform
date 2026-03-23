@@ -7,3 +7,4 @@ class EmbeddingConfig:
     dimension: int = 384
     normalize: bool = True
     batch_size: int = 32
+    device: str = "cpu"
