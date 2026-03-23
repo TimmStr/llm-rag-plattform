@@ -8,11 +8,12 @@ class Retriever:
     def __init__(self,
                  documents: list[dict],
                  vector_store: VectorStore,
-                 embedding_service: EmbeddingService):
+                 embedding_service: EmbeddingService,
+                 reranker: Reranker):
         self.hybrid_search = HybridSearch(documents=documents,
                                           vector_store=vector_store,
                                           embedding_service=embedding_service)
-        self.reranker = Reranker()
+        self.reranker = reranker
 
     def retrieve(self, query: str, top_k: int = 5) -> list[dict]:
         candidates = self.hybrid_search.search(query, top_k=20)

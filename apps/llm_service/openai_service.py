@@ -1,19 +1,14 @@
-import os
-
 from openai import OpenAI
 
+from apps.core.config import get_settings
 from apps.core.llm.base import BaseLLM
-from dotenv import load_dotenv
 
-
-def load_openai_key() -> str:
-    load_dotenv()
-    return os.getenv("OPENAI_KEY")
+settings = get_settings()
 
 
 class OpenAILLM(BaseLLM):
-    def __init__(self, model="gpt-4o-mini"):
-        self.client = OpenAI(api_key=load_openai_key())
+    def __init__(self, model: str):
+        self.client = OpenAI(api_key=settings.openai_token)
         self.model = model
 
     def generate(self, prompt: str) -> str:

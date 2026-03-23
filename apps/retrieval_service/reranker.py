@@ -2,10 +2,9 @@ from sentence_transformers import CrossEncoder
 
 
 class Reranker:
-    def __init__(self,
-                 model_name="cross-encoder/ms-marco-MiniLM-L-6-v2",
-                 device: str = "cpu", ):
-        self.model = CrossEncoder(model_name, device=device)
+    def __init__(self, model_name: str, device: str):
+        self.model = CrossEncoder(model_name=model_name,
+                                  device=device)
 
     def rerank(self, query: str, documents: list[dict], top_k: int = 5):
         pairs = [(query, doc["text"]) for doc in documents]

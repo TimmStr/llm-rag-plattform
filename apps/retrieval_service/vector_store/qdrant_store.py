@@ -4,8 +4,8 @@ from qdrant_client import QdrantClient
 from qdrant_client.http.models import VectorParams, Distance
 from qdrant_client.models import PointStruct
 
+from apps.core.config import Settings
 from apps.core.vector_store.base import VectorStore
-from apps.ingestion_service.embedding import load_embedding_config
 
 
 class QdrantVectorStore(VectorStore):
@@ -15,7 +15,7 @@ class QdrantVectorStore(VectorStore):
                  port: int = 6333):
         self.collection_name = collection_name
         self.client = QdrantClient(host=host, port=port)
-        self._ensure_collection(vector_size=load_embedding_config().dimension)
+        self._ensure_collection(vector_size=Settings.embedding_dimension)
 
     def _ensure_collection(self, vector_size: int) -> None:
         if not self.client.collection_exists(self.collection_name):

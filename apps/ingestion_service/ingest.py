@@ -1,5 +1,4 @@
 import hashlib
-import os.path
 import uuid
 from datetime import datetime
 
@@ -98,11 +97,14 @@ def ingest_and_index(
 
 
 if __name__ == '__main__':
-    vector_store = QdrantVectorStore(collection_name="docs")
-    embedding_service = EmbeddingService()
+    from apps.core.config import get_settings
+
+    settings = get_settings()
+    vector_store = QdrantVectorStore(settings.qdrant_collection_name)
+    embedding_service = EmbeddingService(settings.embedding_model, settings.embedding_device)
 
     ingest_and_index(
-        file_path=os.path.join(os.getcwd(), "data", "raw", "_10-K-2025-As-Filed.pdf"),
+        file_path=settings.demo_document_path,
         vector_store=vector_store,
         embedding_service=embedding_service
     )

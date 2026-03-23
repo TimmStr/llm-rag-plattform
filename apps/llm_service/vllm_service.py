@@ -1,28 +1,18 @@
-import os
-
-from dotenv import load_dotenv
 from openai import OpenAI
 
+from apps.core.config import get_settings
 from apps.core.llm.base import BaseLLM
 
-
-def vllm_config() -> dict[str, str]:
-    load_dotenv()
-    return {
-        "url": os.getenv("VLLM_URL"),
-        "api_key": os.getenv("VLLM_KEY")
-    }
+settings = get_settings()
 
 
 class VLLMLLM(BaseLLM):
-    def __init__(self):
-        conn_config = vllm_config()
-        base_url: str = conn_config["url"]
+    def __init__(self, base_url: str, api_key: str, model: str):
         self.client = OpenAI(
             base_url=base_url,
-            api_key=conn_config["api_key"]
+            api_key=api_key
         )
-        self.model = "Qwen/Qwen3-0.6B"
+        self.model = model
 
     def generate(self, prompt: str) -> str:
         response = self.client.chat.completions.create(

@@ -5,8 +5,8 @@ class Generator:
     def __init__(self, llm: BaseLLM):
         self.llm = llm
 
-    def generate(self, query: str, context: list[str]):
-        context_str = "\n\n".join(context)
+    def generate(self, query: str, contexts: list[str]):
+        context_str = "\n\n".join(contexts)
 
         prompt = f"""
 Answer the question based on the context.

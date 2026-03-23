@@ -1,5 +1,4 @@
-from os import path, getcwd
-
+from apps.core.config import get_settings
 from apps.ingestion_service.embedding import EmbeddingService
 from apps.ingestion_service.ingest import ingest_pdf, embed_chunks, index_chunks
 from apps.llm_service.generator import Generator
@@ -8,13 +7,13 @@ from apps.retrieval_service.retriever import Retriever
 from apps.retrieval_service.vector_store.qdrant_store import QdrantVectorStore
 
 if __name__ == "__main__":
-    file_path = path.join(getcwd(), "data", "raw", "_10-K-2025-As-Filed.pdf")
+    settings = get_settings()
 
-    embedding_service = EmbeddingService()
-    vector_store = QdrantVectorStore(collection_name="docs")
+    embedding_service = EmbeddingService(settings.embedding_model, settings.embedding_device)
+    vector_store = QdrantVectorStore(settings.qdrant_collection_name)
 
     # Ingest
-    chunks = ingest_pdf(file_path)
+    chunks = ingest_pdf(settings.demo_document_path)
     chunks = embed_chunks(chunks, embedding_service)
 
     # Index

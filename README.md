@@ -13,5 +13,9 @@
 - FastAPI
 - Qdrant
 - MLflow
-- -Kubernetes
-- -Prometheus
+- Kubernetes
+- Prometheus
+
+
+## Docker compose
+### docker compose -f infra/docker/docker-compose.yml up --build
