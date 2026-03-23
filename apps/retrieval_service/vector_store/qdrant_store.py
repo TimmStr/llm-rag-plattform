@@ -3,7 +3,6 @@ from typing import Any
 from qdrant_client import QdrantClient
 from qdrant_client.http.models import VectorParams, Distance
 from qdrant_client.models import PointStruct
-from sympy import resultant
 
 from apps.core.vector_store.base import VectorStore
 from apps.ingestion_service.embedding import load_embedding_config
@@ -47,7 +46,6 @@ class QdrantVectorStore(VectorStore):
     def similarity_search(self,
                           query_embedding: list[float],
                           top_k: int = 5) -> list[dict[str, Any]]:
-
         results = self.client.query_points(
             collection_name=self.collection_name,
             query=query_embedding,
