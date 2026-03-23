@@ -32,18 +32,21 @@ def extract_pages(file_path: str) -> list[dict]:
 
 def split_pages(pages: list[dict]) -> list[dict]:
     chunk_config = ChunkConfig()
+
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=chunk_config.chunk_size,
         chunk_overlap=chunk_config.chunk_overlap,
         separators=["\n\n", "\n", ".", ""],
     )
+
     chunks = []
     for page in pages:
         split_texts = splitter.split_text(page["text"])
-        for i, chunk in enumerate(split_texts):
+
+        for i, chunk_text in enumerate(split_texts):
             chunks.append(
                 {
-                    "text": chunk,
+                    "text": chunk_text,
                     "metadata": {
                         "page": page["page"],
                         "chunk_id": i

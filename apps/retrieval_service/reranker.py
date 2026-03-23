@@ -10,5 +10,6 @@ class Reranker:
         scores = self.model.predict(pairs)
         for doc, score in zip(documents, scores):
             doc["rerank_score"] = float(score)
+
         documents = sorted(documents, key=lambda x: x["rerank_score"], reverse=True)
         return documents[:top_k]
