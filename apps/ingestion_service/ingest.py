@@ -2,10 +2,13 @@ import hashlib
 import uuid
 from datetime import datetime
 
+from apps.core.logging_config import get_logger
 from apps.core.vector_store.base import VectorStore
 from apps.ingestion_service.chunking import extract_pages, split_pages
 from apps.ingestion_service.embedding import EmbeddingService
 from apps.retrieval_service.vector_store.qdrant_store import QdrantVectorStore
+
+logger = get_logger(__name__)
 
 
 def hash_to_uuid(hash_str: str) -> str:
@@ -17,6 +20,8 @@ def hash_text(text: str) -> str:
 
 
 def enrich_metadata(chunks: list[dict], source) -> list[dict]:
+    logger.info(f"Enriching metadata for {len(chunks)} chunks from source={source}")
+
     enriched = []
     for chunk in chunks:
         metadata = {
@@ -33,6 +38,7 @@ def enrich_metadata(chunks: list[dict], source) -> list[dict]:
 
 
 def deduplicate(chunks: list[dict]) -> list[dict]:
+    logger.info(f"Deduplicating {len(chunks)} chunks", )
     seen = set()
     unique = []
     for chunk in chunks:
@@ -44,21 +50,22 @@ def deduplicate(chunks: list[dict]) -> list[dict]:
 
 
 def ingest_pdf(file_path: str) -> list[dict]:
-    # Extract
+    logger.info(f"Starting PDF ingestion for file={file_path}")
     pages = extract_pages(file_path)
-    # Chunk
+    logger.info(f"Extracted {len(pages)} pages")
     chunks = split_pages(pages)
-    # Metadata
+    logger.info(f"Split pages into {len(chunks)} chunks")
     chunks = enrich_metadata(chunks, file_path)
-    # Remove duplicates
     chunks = deduplicate(chunks)
+    logger.info(f"Finished ingestion for file={file_path}")
     return chunks
 
 
 def embed_chunks(chunks: list[dict],
                  embedding_service: EmbeddingService) -> list[dict]:
+    logger.info(f"Creating embeddings for {len(chunks)} chunks")
     texts = [chunk["text"] for chunk in chunks]
-    embeddings = embedding_service.embed(texts)
+    embeddings = embedding_service.embed_texts(texts)
 
     enriched = []
     for chunk, embedding in zip(chunks, embeddings):
@@ -66,6 +73,7 @@ def embed_chunks(chunks: list[dict],
             **chunk,
             "embedding": embedding
         })
+    logger.info(f"Created embeddings for {len(enriched)} chunks", )
     return enriched
 
 
