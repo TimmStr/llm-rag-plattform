@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
@@ -10,28 +10,33 @@ logger = get_logger(__name__)
 
 def register_exception_handlers(app: FastAPI) -> None:
     @app.exception_handler(RequestValidationError)
-    async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
-        logger.warning(f"Validation exception occurred on {request.url}: {exc.errors()} ")
+    async def validation_exception_handler(request: Request, exc: RequestValidationError):
         return JSONResponse(
             status_code=422,
             content={
                 "detail": "Validation error",
-                "errors": exc.errors()
-            }
+                "errors": exc.errors(),
+            },
         )
 
     @app.exception_handler(AppError)
-    async def app_error_handler(request: Request, exc: AppError) -> JSONResponse:
-        logger.warning(f"Application error on {request.url.path}: {exc}")
+    async def app_error_handler(request: Request, exc: AppError):
         return JSONResponse(
-            status_code=400,
-            content={"detail": str(exc)}
+            status_code=exc.status_code,
+            content={"detail": exc.message},
+        )
+
+    @app.exception_handler(HTTPException)
+    async def http_exception_handler(request: Request, exc: HTTPException):
+        return JSONResponse(
+            status_code=exc.status_code,
+            content={"detail": exc.detail},
         )
 
     @app.exception_handler(Exception)
-    async def exception_handler(request: Request, exc: Exception) -> JSONResponse:
-        logger.exception(f"Unhandled exception on {request.url.path}")
+    async def generic_exception_handler(request: Request, exc: Exception):
+        logger.exception("Unhandled exception")
         return JSONResponse(
             status_code=500,
-            content={"detail": "Internal server error"}
+            content={"detail": "Internal server error"},
         )

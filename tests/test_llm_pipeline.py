@@ -1,6 +1,8 @@
 from apps.core.config import get_settings
-from apps.ingestion_service.embedding import EmbeddingService
-from apps.ingestion_service.ingest import ingest_pdf, embed_chunks, index_chunks
+from apps.ingestion_service.provider.embedding_provider import EmbeddingService
+from apps.ingestion_service.services.indexing_service import docs_to_vectorstore
+from apps.ingestion_service.services.embedding_service import embed_chunks
+from apps.ingestion_service.services.ingest_service import ingest_pdf
 from apps.llm_service.generator import Generator
 from apps.llm_service.vllm_service import VLLMLLM
 from apps.retrieval_service.retriever import Retriever
@@ -17,7 +19,7 @@ if __name__ == "__main__":
     chunks = embed_chunks(chunks, embedding_service)
 
     # Index
-    index_chunks(chunks, vector_store)
+    docs_to_vectorstore(chunks, vector_store)
 
     # Retriever
     retriever = Retriever(

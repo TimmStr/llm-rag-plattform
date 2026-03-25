@@ -2,8 +2,9 @@ from functools import lru_cache
 
 from apps.core.config import get_settings
 from apps.core.llm.base import BaseLLM
-from apps.ingestion_service.embedding import EmbeddingService
-from apps.ingestion_service.ingest import ingest_pdf, embed_chunks
+from apps.ingestion_service.provider.embedding_provider import EmbeddingService
+from apps.ingestion_service.services.embedding_service import embed_chunks
+from apps.ingestion_service.services.ingest_service import ingest_pdf
 from apps.llm_service.generator import Generator
 from apps.llm_service.openai_service import OpenAILLM
 from apps.llm_service.vllm_service import VLLMLLM

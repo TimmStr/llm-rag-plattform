@@ -27,6 +27,7 @@ httpx==0.28.1
 huggingface_hub==1.7.2
 hyperframe==6.1.0
 idna==3.11
+iniconfig==2.3.0
 Jinja2==3.1.6
 jiter==0.13.0
 joblib==1.5.3
@@ -60,6 +61,7 @@ openai==2.29.0
 orjson==3.11.7
 packaging==26.0
 passlib==1.7.4
+pluggy==1.6.0
 portalocker==3.2.0
 protobuf==7.34.1
 pyasn1==0.6.3
@@ -69,6 +71,7 @@ pydantic-settings==2.13.1
 pydantic_core==2.41.5
 Pygments==2.19.2
 pypdf==6.9.1
+pytest==9.0.2
 python-dotenv==1.2.2
 python-jose==3.5.0
 python-multipart==0.0.22

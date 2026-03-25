@@ -1,3 +1,4 @@
+from dataclasses import asdict
 from typing import Any
 
 from qdrant_client import QdrantClient
@@ -7,6 +8,8 @@ from qdrant_client.models import PointStruct
 from apps.core.config import Settings
 from apps.core.logging_config import get_logger
 from apps.core.vector_store.base import VectorStore
+from apps.ingestion_service.domain.entities import Chunk
+from apps.ingestion_service.infrastructure.hashing import hash_to_uuid
 
 logger = get_logger(__name__)
 
@@ -29,16 +32,23 @@ class QdrantVectorStore(VectorStore):
                                             distance=Distance.COSINE)
             )
 
-    def add_documents(self,
-                      ids: list[str],
-                      embeddings: list[list[float]],
-                      metadatas: list[dict[str, Any]]) -> None:
+    def add_documents(self, chunks: list[Chunk]) -> None:
+
+        ids = []
+        embeddings = []
+        metadatas = []
+        for i, chunk in enumerate(chunks):
+            ids.append(hash_to_uuid(chunk.metadata.hash))
+            embeddings.append(chunk.embedding)
+            chunk.metadata.text = chunk.text
+            metadatas.append(chunk.metadata)
+
         logger.info(f"Upserting {len(ids)} documents into Qdrant collection={self.collection_name}")
         points = [
             PointStruct(
                 id=ids[index],
                 vector=embeddings[index],
-                payload=metadatas[index]
+                payload=asdict(metadatas[index])
             )
             for index in range(len(ids))
         ]

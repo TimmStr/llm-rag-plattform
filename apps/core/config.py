@@ -1,5 +1,5 @@
 import os
-from dataclasses import dataclass
+from apps.ingestion_service.domain.entities import dataclass
 
 
 @dataclass

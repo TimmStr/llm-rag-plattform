@@ -1,28 +1,32 @@
-from os import path, getcwd
-
-from apps.ingestion_service.embedding import EmbeddingService
-from apps.ingestion_service.ingest import ingest_pdf, embed_chunks, index_chunks
+from apps.ingestion_service.provider.embedding_provider import EmbeddingService
+from apps.ingestion_service.services.indexing_service import docs_to_vectorstore
+from apps.ingestion_service.services.embedding_service import embed_chunks
+from apps.ingestion_service.services.ingest_service import ingest_pdf
+from apps.retrieval_service.reranker import Reranker
 from apps.retrieval_service.retriever import Retriever
 from apps.retrieval_service.vector_store.qdrant_store import QdrantVectorStore
 
 if __name__ == "__main__":
-    file_path = path.join(getcwd(), "data", "raw", "_10-K-2025-As-Filed.pdf")
+    from apps.core.config import get_settings
 
-    embedding_service = EmbeddingService()
-    vector_store = QdrantVectorStore(collection_name="docs")
+    settings = get_settings()
+
+    embedding_service = EmbeddingService(settings.embedding_model, settings.embedding_device)
+    vector_store = QdrantVectorStore(settings.qdrant_collection_name)
 
     # Ingest
-    chunks = ingest_pdf(file_path)
+    chunks = ingest_pdf(settings.demo_document_path)
     chunks = embed_chunks(chunks, embedding_service)
 
     # Index
-    index_chunks(chunks, vector_store)
+    docs_to_vectorstore(chunks, vector_store)
 
     # Retriever
     retriever = Retriever(
         documents=chunks,
         vector_store=vector_store,
-        embedding_service=embedding_service
+        embedding_service=embedding_service,
+        reranker=Reranker(settings.reranker_model, settings.reranker_device)
     )
 
     # Query

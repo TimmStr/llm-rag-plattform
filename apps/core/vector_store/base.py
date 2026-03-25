@@ -1,13 +1,12 @@
 from abc import ABC, abstractmethod
 from typing import Any
 
+from apps.ingestion_service.domain.entities import Chunk
+
 
 class VectorStore(ABC):
     @abstractmethod
-    def add_documents(self,
-                      ids: list[str],
-                      embeddings: list[list[float]],
-                      metadatas: list[dict[str, Any]]) -> None:
+    def add_documents(self, chunks: list[Chunk]) -> None:
         pass
 
     @abstractmethod
